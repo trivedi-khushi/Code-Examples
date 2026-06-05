@@ -1,16 +1,93 @@
-# React + Vite
+# VideoSDK Live Captions Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimal React example that demonstrates the [VideoSDK](https://videosdk.live) **Live Captions** feature — starting, stopping, and displaying real-time speech transcriptions inside a live meeting.
 
-Currently, two official plugins are available:
+Official Documentation for the Live Captions Feature [here](https://docs.videosdk.live/javascript/guide/interactive-live-streaming/live-captioning)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 1. Overview
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This example shows how to:
 
-## Expanding the ESLint configuration
+- Create a VideoSDK room via the REST API
+- Join the room using `<MeetingProvider />` from `@videosdk.live/react-sdk`
+- Start and stop live captions using the `useTranscription()` hook
+- Display real-time captions in the UI, deduplicating VideoSDK's interim and final transcript events
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 2. Prerequisites
+
+- Node.js 16+
+- A free [VideoSDK account](https://app.videosdk.live/)
+- A VideoSDK auth token (see step 4)
+
+---
+
+## 3. Set-Up
+
+```bash
+git clone https://github.com/trivedi-khushi/Code-Examples.git
+cd Code-Examples/live-transcript
+npm install
+```
+
+Create a `.env` file at the project root:
+VITE_VIDEOSDK_TOKEN=your_token_here
+
+---
+
+## 4. How to Get Your VideoSDK Token
+
+1. Go to the [VideoSDK Dashboard](https://app.videosdk.live/dashboard)
+2. Navigate to the **API Keys** section
+3. Generate a **temporary token** — it's a long JWT string starting with `eyJ`
+4. Paste it into your `.env` file as `VITE_VIDEOSDK_TOKEN`
+
+> Do not use the API key itself — you need the generated JWT token.
+
+---
+
+## 5. Run
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:5173` in your browser, click **Create & Join Meeting**, then click **Start Captions** and speak.
+
+---
+
+## 6. Key Files
+
+| File | Purpose |
+|---|---|
+| `src/App.jsx` | Top-level state; switches between JoinScreen and MeetingProvider |
+| `src/api.js` | `createMeeting()` REST helper for the VideoSDK rooms endpoint |
+| `src/components/JoinScreen.jsx` | Single-button screen that creates and joins a room |
+| `src/components/MeetingView.jsx` | Waits for meeting join, then renders the captions UI |
+| `src/components/CaptionsView.jsx` | Start/Stop buttons and the scrolling captions display |
+| `src/hooks/useCaptions.js` | Wrapper around VideoSDK's `useTranscription` hook with deduplication logic |
+| `src/index.css` | Plain CSS styles for the demo |
+
+---
+
+## 7. How It Works
+
+VideoSDK fires three events per spoken phrase:
+
+- `realtime` — partial transcript, updates as you speak
+- `fullSentence` — completed phrase
+- `realtime` (duplicate) — fired again at the same timestamp as `fullSentence`
+
+`useCaptions.js` handles all three by updating the last caption line in-place while speaking, committing it on `fullSentence`, and skipping the duplicate `realtime` via timestamp comparison.
+
+---
+
+## 8. VideoSDK API Reference
+
+- [`useTranscription()`](https://docs.videosdk.live/react/api/sdk-reference/use-transcription)
+- [`startTranscription()`](https://docs.videosdk.live/js-sdk-reference/classes/Meeting#starttranscription)
+- [`stopTranscription()`](https://docs.videosdk.live/js-sdk-reference/classes/Meeting#stoptranscription)
+- [Live Captions Guide — JavaScript](https://docs.videosdk.live/javascript/guide/interactive-live-streaming/live-captioning)

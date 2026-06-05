@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useTranscription, Constants } from "@videosdk.live/react-sdk";
 
 export function useCaptions() {
   const [captions, setCaptions] = useState([]);
   const [status, setStatus] = useState("stopped");
+  const lastTypeRef = useRef(null);
+  const lastTimestampRef = useRef(null);
 
   const { startTranscription, stopTranscription } = useTranscription({
     onTranscriptionStateChanged: ({ status: s }) => {
@@ -13,11 +15,33 @@ export function useCaptions() {
       else if (s === Constants.transcriptionEvents.TRANSCRIPTION_STOPPED) setStatus("stopped");
     },
     onTranscriptionText: ({ participantName, text, timestamp, type }) => {
-      // Log everything so we can see what `type` value VideoSDK actually sends
-      console.log("transcription event →", { participantName, text, type, timestamp });
+      const isInterim = type === "realtime";
+
+      if (isInterim && timestamp === lastTimestampRef.current) {
+        return;
+      }
+
+      lastTimestampRef.current = timestamp;
+
       setCaptions(prev => {
-        const updated = [...prev, { participantName, text, timestamp }];
-        return updated.slice(-50);
+        const last = prev[prev.length - 1];
+
+        if (last && lastTypeRef.current === "realtime" && isInterim) {
+          const updated = [...prev];
+          updated[updated.length - 1] = { participantName, text, timestamp };
+          lastTypeRef.current = "realtime";
+          return updated;
+        }
+
+        if (last && lastTypeRef.current === "realtime" && !isInterim) {
+          const updated = [...prev];
+          updated[updated.length - 1] = { participantName, text, timestamp };
+          lastTypeRef.current = "fullSentence";
+          return updated;
+        }
+
+        lastTypeRef.current = isInterim ? "realtime" : "fullSentence";
+        return [...prev, { participantName, text, timestamp }].slice(-50);
       });
     },
   });
