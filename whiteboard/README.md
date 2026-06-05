@@ -62,23 +62,9 @@ Open `http://localhost:5173` in your browser, click **Create & Join Meeting**, t
 
 ## 6. How It Works
 
-### `createMeeting()` — `src/api.js`
-Makes a `POST` request to `https://api.videosdk.live/v2/rooms` with the raw token in the `Authorization` header (no `Bearer` prefix). Returns the new `roomId`.
 
-### `<MeetingProvider>` — `src/App.jsx`
-VideoSDK's React context provider. Wraps the meeting UI and receives `meetingId`, `token`, and `joinWithoutUserInteraction: true` so the SDK joins as soon as the component mounts.
+https://github.com/user-attachments/assets/a69084bb-1370-46d4-8a79-d6395f2d860a
 
-### `onMeetingJoined` event — `src/components/MeetingView.jsx`
-Listens for the meeting to be fully joined before rendering the whiteboard UI. This ensures `useWhiteboard()` is ready before the user can interact.
-
-### `useWhiteboard()` hook — `src/hooks/useWhiteboard.js`
-Wraps VideoSDK's built-in `useWhiteboard` hook from `@videosdk.live/react-sdk`. Exposes three values:
-- `startWhiteboard()` — starts the session for all participants
-- `stopWhiteboard()` — stops the session for all participants
-- `whiteboardUrl` — the embeddable URL, automatically set by the SDK once the session starts
-
-### `<iframe>` embed — `src/components/WhiteboardView.jsx`
-Once `whiteboardUrl` is available, it is rendered inside an `<iframe>`. No extra rendering library is needed — VideoSDK returns a fully hosted whiteboard page.
 
 ---
 
