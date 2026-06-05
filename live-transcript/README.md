@@ -17,7 +17,7 @@ This example shows how to:
 
 ---
 
-## 2. Pre-R
+## 2. Pre-Requisites
 
 equisites
 
