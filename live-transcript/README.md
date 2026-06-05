@@ -17,7 +17,9 @@ This example shows how to:
 
 ---
 
-## 2. Prerequisites
+## 2. Pre-R
+
+equisites
 
 - Node.js 16+
 - A free [VideoSDK account](https://app.videosdk.live/)
@@ -74,6 +76,10 @@ Open `http://localhost:5173` in your browser, click **Create & Join Meeting**, t
 ---
 
 ## 7. How It Works
+
+
+https://github.com/user-attachments/assets/1ef5d71d-49cd-4f76-bd85-d65507761cc3
+
 
 VideoSDK fires three events per spoken phrase:
 
